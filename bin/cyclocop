@@ -10,6 +10,7 @@ cli = RuboCop::CLI.new
 result = 0
 
 $stdout = StringIO.new
+$stderr = StringIO.new
 
 time = Benchmark.realtime do
   result = cli.run
