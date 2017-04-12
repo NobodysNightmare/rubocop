@@ -14,11 +14,31 @@ module RuboCop
       # and ||/or is shorthand for a sequence of ifs, so they also add one.
       # Loops can be said to have an exit condition, so they add one.
       class CyclomaticComplexity < Cop
+        class << self
+          attr_reader :total_cyclo
+          attr_reader :total_methods
+
+          def add_cyclo(cyclo)
+            @total_cyclo = (@total_cyclo || 0) + cyclo
+          end
+
+          def add_method
+            @total_methods = (@total_methods || 0) + 1
+          end
+        end
+
         include MethodComplexity
 
         MSG = 'Cyclomatic complexity for %s is too high. [%d/%d]'.freeze
         COUNTED_NODES = %i[if while until for
                            rescue when and or].freeze
+
+        def on_method_def(node, *args)
+          self.class.add_method
+          self.class.add_cyclo(complexity(node))
+
+          super
+        end
 
         private
 

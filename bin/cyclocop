@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+$LOAD_PATH.unshift(File.dirname(File.realpath(__FILE__)) + '/../lib')
+
+require 'rubocop'
+require 'benchmark'
+
+cli = RuboCop::CLI.new
+result = 0
+
+$stdout = StringIO.new
+
+time = Benchmark.realtime do
+  result = cli.run
+end
+
+puts "Finished in #{time} seconds" if cli.options[:debug]
+
+cyclo = RuboCop::Cop::Metrics::CyclomaticComplexity.total_cyclo || 0
+methods = RuboCop::Cop::Metrics::CyclomaticComplexity.total_methods || 1
+
+$stdout = STDOUT
+puts "#{File.basename(Dir.pwd)},#{cyclo},#{methods}"
+
+exit result
